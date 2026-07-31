@@ -34,3 +34,10 @@ build/
 
 ### Local Configuration ###
 src/main/resources/application-local.properties
+src/main/resources/application-prod.properties
+
+### Environment Files ###
+.env
+.env.local
+.env.production
+.env.*.local

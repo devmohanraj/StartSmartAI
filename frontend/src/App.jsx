@@ -86,7 +86,7 @@ function App() {
   const fetchUserProjects = async (userId) => {
     setLoadingProjects(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/projects/user/${userId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/user/${userId}`);
       if (!res.ok) throw new Error("Failed to fetch projects");
       const projects = await res.json();
       setUserProjects(projects);

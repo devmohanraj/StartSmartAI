@@ -39,8 +39,8 @@ function AuthModal({ isOpen, onClose, initialMode = "login", onAuthSuccess }) {
 
     try {
       const url = mode === "login"
-        ? "http://localhost:8080/api/auth/login"
-        : "http://localhost:8080/api/auth/signup";
+        ? `${import.meta.env.VITE_API_URL}/api/auth/login`
+        : `${import.meta.env.VITE_API_URL}/api/auth/signup`;
 
       const body = mode === "login"
         ? { email: formData.email, password: formData.password }

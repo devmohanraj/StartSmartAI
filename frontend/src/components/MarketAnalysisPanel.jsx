@@ -57,7 +57,7 @@ function MarketAnalysisPanel({
     let cancelled = false;
 
     // First, try to GET existing analysis from database
-    fetch(`http://localhost:8080/api/projects/${projectId}/market-analysis`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}/market-analysis`, {
       method: "GET",
     })
       .then(async (res) => {
@@ -82,7 +82,7 @@ function MarketAnalysisPanel({
           // No cached analysis - generate new one via POST
           try {
             const postRes = await fetch(
-              `http://localhost:8080/api/projects/${projectId}/market-analysis`,
+              `${import.meta.env.VITE_API_URL}/api/projects/${projectId}/market-analysis`,
               {
                 method: "POST",
               },
@@ -128,7 +128,7 @@ function MarketAnalysisPanel({
     if (!isServerError) return;
 
     const pollInterval = setInterval(() => {
-      fetch(`http://localhost:8080/api/projects/${projectId}/market-analysis`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}/market-analysis`, {
         method: "GET",
       })
         .then(async (res) => {
@@ -160,7 +160,7 @@ function MarketAnalysisPanel({
     setError("");
     setData(null);
 
-    fetch(`http://localhost:8080/api/projects/${projectId}/market-analysis`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}/market-analysis`, {
       method: "POST",
     })
       .then(async (res) => {
