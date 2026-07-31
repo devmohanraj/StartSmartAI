@@ -1,0 +1,200 @@
+import { useState, useEffect, useCallback } from 'react';
+import Navbar from './components/Navbar';
+import ProjectForm from './components/ProjectForm';
+import AboutPanel from './components/AboutPanel';
+import MarketAnalysisPanel from './components/MarketAnalysisPanel';
+import AuthModal from './components/AuthModal';
+import MyProjects from './components/MyProjects';
+import RiskAssessment from './components/RiskAssessment';
+import Recommendations from './components/Recommendations';
+import Dashboard from './components/Dashboard';
+import './index.css';
+
+function App() {
+  const [activeTab, setActiveTab] = useState('Project Input');
+  const [submittedProject, setSubmittedProject] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Auth state
+  const [user, setUser] = useState(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login');
+
+  // User's projects from backend
+  const [userProjects, setUserProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+
+  // Cache for analysis results keyed by projectId
+  const [analysisCache, setAnalysisCache] = useState({});
+
+  const handleProjectSubmit = (project) => {
+    setSubmittedProject(project);
+    setIsAnalyzing(true);
+    // Add to user's projects list
+    setUserProjects((prev) => {
+      if (prev.some((p) => p.projectId === project.projectId)) return prev;
+      return [project, ...prev];
+    });
+  };
+
+  const handleReset = () => {
+    setSubmittedProject(null);
+    setIsAnalyzing(false);
+  };
+
+  // Scroll to top when submittedProject changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [submittedProject]);
+
+  const handleAnalysisComplete = useCallback(() => {
+    setIsAnalyzing(false);
+  }, []);
+
+  const handleCacheAnalysis = useCallback((projectId, data) => {
+    setAnalysisCache((prev) => ({ ...prev, [projectId]: data }));
+  }, []);
+
+  // Auth handlers
+  const handleOpenAuth = (mode = 'login') => {
+    setAuthModalMode(mode);
+    setAuthModalOpen(true);
+  };
+
+  const handleCloseAuth = () => {
+    setAuthModalOpen(false);
+  };
+
+  const handleAuthSuccess = async (userData) => {
+    setUser(userData);
+    setAuthModalOpen(false);
+    // Fetch user's projects from backend
+    await fetchUserProjects(userData.userId);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setUserProjects([]);
+    setSubmittedProject(null);
+    setActiveTab('Project Input');
+  };
+
+  const handleMyProjects = () => {
+    setActiveTab('My Projects');
+  };
+
+  const fetchUserProjects = async (userId) => {
+    setLoadingProjects(true);
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/user/${userId}`);
+      if (!res.ok) throw new Error("Failed to fetch projects");
+      const projects = await res.json();
+      setUserProjects(projects);
+    } catch (err) {
+      console.error("Failed to fetch projects:", err);
+      setUserProjects([]);
+    } finally {
+      setLoadingProjects(false);
+    }
+  };
+
+  const handleSelectProject = (project) => {
+    setSubmittedProject(project);
+    setActiveTab('Project Input');
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === 'Project Input') setSubmittedProject(null);
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'Project Input':
+        return (
+          <div className="max-w-345 mx-auto px-6 py-4">
+            {submittedProject ? (
+              <div className="animate-slide-up stagger-1 w-full">
+                <MarketAnalysisPanel
+                  projectId={submittedProject.projectId}
+                  onAnalysisComplete={handleAnalysisComplete}
+                  onCacheAnalysis={handleCacheAnalysis}
+                  cachedData={analysisCache[submittedProject.projectId]}
+                  project={submittedProject}
+                  onReset={handleReset}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 w-full">
+                <div className="animate-slide-up stagger-1 lg:col-span-6">
+                  <AboutPanel />
+                </div>
+                <div className="animate-slide-up stagger-2 lg:col-span-6">
+                  <ProjectForm
+                    onSuccess={handleProjectSubmit}
+                    isLoggedIn={!!user}
+                    onRequireAuth={() => handleOpenAuth('signup')}
+                    userId={user?.userId}
+                  />
+                </div>
+              </div>
+            )}
+            {isAnalyzing && submittedProject && (
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-gray-800 rounded-2xl shadow-xl p-8 flex flex-col items-center gap-4">
+                  <svg className="w-12 h-12 animate-spin text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <p className="text-sm font-medium text-gray-300">Analyzing Market & Competitors...</p>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      case 'My Projects':
+        return (
+          <MyProjects
+            projects={userProjects}
+            onSelectProject={handleSelectProject}
+            loading={loadingProjects}
+          />
+        );
+      case 'Risk Assessment':
+        return <RiskAssessment />;
+      case 'Recommendations':
+        return <Recommendations />;
+      case 'Dashboard':
+        return <Dashboard />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-linear-to-br from-gray-950 via-gray-900 to-slate-900">
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        user={user}
+        onLoginClick={() => handleOpenAuth('login')}
+        onMyProjects={handleMyProjects}
+        onLogout={handleLogout}
+      />
+      <main className="flex-1 animate-[fadeIn_0.4s_ease]">
+        {renderContent()}
+      </main>
+
+      {/* Auth Modal */}
+      <AuthModal
+        key={authModalOpen ? 'open' : 'closed'}
+        isOpen={authModalOpen}
+        onClose={handleCloseAuth}
+        initialMode={authModalMode}
+        onAuthSuccess={handleAuthSuccess}
+      />
+    </div>
+  );
+}
+
+export default App;
