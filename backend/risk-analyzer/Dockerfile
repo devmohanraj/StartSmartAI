@@ -46,9 +46,4 @@ ENV PORT=8080
 
 # Run the application
 # The server.port is read from application-prod.properties which uses ${PORT:8080}
-ENTRYPOINT ["java",
-"-Xms128m",
-"-Xmx384m",
-"-XX:+UseSerialGC",
-"-jar",
-"app.jar"]
+ENTRYPOINT ["java","-Xms128m","-Xmx384m","-XX:+UseSerialGC","-jar","app.jar"]
