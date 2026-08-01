@@ -1,0 +1,57 @@
+# ===========================================
+# StartSmart AI - Docker Ignore Rules
+# Excludes unnecessary files from the Docker build context
+# ===========================================
+
+# ---------- Build Artifacts ----------
+target/
+*.jar
+*.war
+
+# ---------- Maven Wrapper (not needed inside Docker) ----------
+.mvn/
+mvnw
+mvnw.cmd
+
+# ---------- Environment & Secret Files ----------
+# Never copy files containing credentials or secrets into the image
+# application-prod.properties is intentionally INCLUDED because it only
+# contains environment variable references (${DB_URL}, etc.), not secrets.
+# The actual secrets come from Render's environment variables at runtime.
+src/main/resources/application-local.properties
+src/main/resources/application-local.properties.example
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ---------- IDE & Editor Files ----------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+.apt_generated
+
+# ---------- Git Files ----------
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# ---------- Test Files (not needed in production image) ----------
+src/test/
+
+# ---------- Documentation ----------
+HELP.md
+README.md
+
+# ---------- OS Files ----------
+.DS_Store
+Thumbs.db

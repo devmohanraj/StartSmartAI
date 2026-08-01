@@ -33,8 +33,11 @@ build/
 .vscode/
 
 ### Local Configuration ###
+# application-local.properties contains real credentials and must stay ignored.
+# application-prod.properties is committed because it only contains
+# environment variable placeholders (${DB_URL}, ${GEMINI_API_KEY}, etc.)
+# and must be present in the Docker image at runtime.
 src/main/resources/application-local.properties
-src/main/resources/application-prod.properties
 
 ### Environment Files ###
 .env
