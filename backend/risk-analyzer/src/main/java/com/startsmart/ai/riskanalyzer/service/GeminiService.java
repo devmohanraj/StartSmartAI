@@ -50,7 +50,16 @@ public class GeminiService {
 
     private String buildPrompt(Project project) {
         return """
-                You are a market research analyst. Analyze the following startup/project and provide market sizing, growth rate, market trends from 2020 to 2026, and competitor analysis.
+                You are a market research analyst specializing in the Indian market. Analyze the following startup/project and provide market sizing, growth rate, market trends from 2020 to 2026, and competitor analysis focused on the Indian market.
+
+                Important guidelines:
+                - All market size values (TAM, SAM, SOM) must be raw numbers representing Indian Rupees (INR). For example, 2400000000 means ₹240 Crore.
+                - All competitor revenue must be in INR with Indian units (e.g., "₹38 Cr", "₹220 Cr", "₹5 L").
+                - Competitors should be real or realistic companies operating in India.
+                - Provide exactly the top 3 competitors ranked by market share.
+                - Market trends should reflect the Indian market context.
+                - Growth rate should reflect the Indian market growth for this sector.
+                - Market sizes should be realistic for the Indian market, not global figures.
 
                 Project details:
                 - Industry/Sector: %s
@@ -75,9 +84,10 @@ public class GeminiService {
                       {"year": 2026, "value": 33}
                     ],
                     "competitors": [
-                      {"name": "Competitor A", "marketShare": "22%%", "revenue": "$38M", "growth": "+8%%", "position": "Direct"},
-                      {"name": "Competitor B", "marketShare": "15%%", "revenue": "$22M", "growth": "+12%%", "position": "Direct"},
-                      {"name": "Competitor C", "marketShare": "8%%", "revenue": "$10M", "growth": "+5%%", "position": "Indirect"}
+                      {"name": "Competitor A", "marketShare": "22%%", "revenue": "₹38 Cr", "growth": "+8%%", "position": "Direct"},
+                      {"name": "Competitor B", "marketShare": "15%%", "revenue": "₹22 Cr", "growth": "+12%%", "position": "Direct"},
+                      {"name": "Competitor C", "marketShare": "8%%", "revenue": "₹10 Cr", "growth": "+5%%", "position": "Indirect"},
+                      {"name": "Competitor D", "marketShare": "5%%", "revenue": "₹6 Cr", "growth": "+3%%", "position": "Indirect"}
                     ]
                   }
                 }

@@ -4,11 +4,14 @@ import com.startsmart.ai.riskanalyzer.dto.ProjectRequestDTO;
 import com.startsmart.ai.riskanalyzer.dto.ProjectResponseDTO;
 import com.startsmart.ai.riskanalyzer.entity.Project;
 import com.startsmart.ai.riskanalyzer.entity.User;
+import com.startsmart.ai.riskanalyzer.repository.CompetitorAnalysisRepository;
+import com.startsmart.ai.riskanalyzer.repository.MarketAnalysisRepository;
 import com.startsmart.ai.riskanalyzer.repository.ProjectRepository;
 import com.startsmart.ai.riskanalyzer.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +21,8 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final MarketAnalysisRepository marketAnalysisRepository;
+    private final CompetitorAnalysisRepository competitorAnalysisRepository;
 
     public ProjectResponseDTO createProject(ProjectRequestDTO dto, Long userId) {
         User user = userRepository.findById(userId)
@@ -51,7 +56,7 @@ public class ProjectService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        return projectRepository.findByUserUserId(userId).stream()
+        return projectRepository.findByUserUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(project -> ProjectResponseDTO.builder()
                         .projectId(project.getProjectId())
                         .projectName(project.getProjectName())
@@ -63,5 +68,17 @@ public class ProjectService {
                         .createdAt(project.getCreatedAt())
                         .build())
                 .toList();
+    }
+
+    @Transactional
+    public void deleteProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
+        
+        // Delete related records first to avoid foreign key constraint violation
+        marketAnalysisRepository.deleteByProjectProjectId(projectId);
+        competitorAnalysisRepository.deleteByProjectProjectId(projectId);
+        
+        projectRepository.delete(project);
     }
 }

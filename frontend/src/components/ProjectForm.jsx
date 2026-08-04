@@ -255,7 +255,7 @@ function ProjectForm({ onSuccess, isLoggedIn, onRequireAuth, userId }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-10 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full h-10 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

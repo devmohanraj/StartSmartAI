@@ -92,7 +92,7 @@ function AuthModal({ isOpen, onClose, initialMode = "login", onAuthSuccess }) {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
           aria-label="Close"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -128,7 +128,7 @@ function AuthModal({ isOpen, onClose, initialMode = "login", onAuthSuccess }) {
         <div className="flex gap-1 p-1 bg-gray-700 rounded-lg mb-6">
           <button
             onClick={() => handleModeChange("login")}
-            className={`flex-1 h-9 text-sm font-medium rounded-md transition-all ${
+            className={`flex-1 h-9 text-sm font-medium rounded-md transition-all cursor-pointer ${
               mode === "login"
                 ? "bg-gray-600 text-indigo-400 shadow-sm"
                 : "text-gray-400 hover:text-gray-200"
@@ -138,7 +138,7 @@ function AuthModal({ isOpen, onClose, initialMode = "login", onAuthSuccess }) {
           </button>
           <button
             onClick={() => handleModeChange("signup")}
-            className={`flex-1 h-9 text-sm font-medium rounded-md transition-all ${
+            className={`flex-1 h-9 text-sm font-medium rounded-md transition-all cursor-pointer ${
               mode === "signup"
                 ? "bg-gray-600 text-indigo-400 shadow-sm"
                 : "text-gray-400 hover:text-gray-200"
@@ -201,11 +201,11 @@ function AuthModal({ isOpen, onClose, initialMode = "login", onAuthSuccess }) {
           </div>
 
           <div className="pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-10 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-10 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -228,7 +228,7 @@ function AuthModal({ isOpen, onClose, initialMode = "login", onAuthSuccess }) {
           {mode === "login" ? "Don't have an account? " : "Already have an account? "}
           <button
             onClick={switchMode}
-            className="text-indigo-400 font-medium hover:text-indigo-300 transition-colors"
+            className="text-indigo-400 font-medium hover:text-indigo-300 transition-colors cursor-pointer"
           >
             {mode === "login" ? "Sign up" : "Log in"}
           </button>

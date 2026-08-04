@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import ProjectForm from './components/ProjectForm';
 import AboutPanel from './components/AboutPanel';
@@ -15,22 +16,19 @@ function App() {
   const [submittedProject, setSubmittedProject] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Auth state
   const [user, setUser] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
 
-  // User's projects from backend
   const [userProjects, setUserProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
+  const [deletingProjectId, setDeletingProjectId] = useState(null);
 
-  // Cache for analysis results keyed by projectId
   const [analysisCache, setAnalysisCache] = useState({});
 
   const handleProjectSubmit = (project) => {
     setSubmittedProject(project);
     setIsAnalyzing(true);
-    // Add to user's projects list
     setUserProjects((prev) => {
       if (prev.some((p) => p.projectId === project.projectId)) return prev;
       return [project, ...prev];
@@ -42,7 +40,6 @@ function App() {
     setIsAnalyzing(false);
   };
 
-  // Scroll to top when submittedProject changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [submittedProject]);
@@ -55,7 +52,6 @@ function App() {
     setAnalysisCache((prev) => ({ ...prev, [projectId]: data }));
   }, []);
 
-  // Auth handlers
   const handleOpenAuth = (mode = 'login') => {
     setAuthModalMode(mode);
     setAuthModalOpen(true);
@@ -68,7 +64,6 @@ function App() {
   const handleAuthSuccess = async (userData) => {
     setUser(userData);
     setAuthModalOpen(false);
-    // Fetch user's projects from backend
     await fetchUserProjects(userData.userId);
   };
 
@@ -101,6 +96,30 @@ function App() {
   const handleSelectProject = (project) => {
     setSubmittedProject(project);
     setActiveTab('Project Input');
+  };
+
+  const handleDeleteProject = async (projectId) => {
+    if (!user) return;
+    setDeletingProjectId(projectId);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || 'Failed to delete project');
+      }
+      setUserProjects((prev) => prev.filter((p) => p.projectId !== projectId));
+      if (submittedProject?.projectId === projectId) {
+        handleReset();
+      }
+      toast.success('Project deleted successfully');
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      toast.error(err.message || 'Failed to delete project. Please try again.');
+    } finally {
+      setDeletingProjectId(null);
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -157,7 +176,9 @@ function App() {
           <MyProjects
             projects={userProjects}
             onSelectProject={handleSelectProject}
+            onDeleteProject={handleDeleteProject}
             loading={loadingProjects}
+            deletingProjectId={deletingProjectId}
           />
         );
       case 'Risk Assessment':
